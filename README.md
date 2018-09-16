@@ -2,7 +2,7 @@
 ID generation service inspired by Twitter's [Snowflake](https://github.com/twitter-archive/snowflake/tree/b3f6a3c6ca8e1b6847baa6ff42bf72201e2c2231)
 
 ## Using with Docker
-You can run the following command to run it locally:
+You can run the following command to run it locally from [Docker Hub](https://hub.docker.com/r/everettcaleb/snowflake/):
 
     docker run -d --name snowflake -e MACHINE_ID=0 -p 8080:8080 everettcaleb/snowflake:1
 
@@ -11,7 +11,7 @@ Then you can test it with:
     curl http://localhost:8080/v1/snowflake
 
 ## Using with Kubernetes
-You can deploy it as a StatefulSet (a Deployment won't work because the `MACHINE_ID` values need to be unique):
+You can deploy it as a [StatefulSet](k8s/statefulset.yaml) and [Service](k8s/service.yaml) (a Deployment won't work because the `MACHINE_ID` values need to be unique):
 
     kubectl create -f k8s/statefulset.yaml
     kubectl create -f k8s/service.yaml
@@ -24,6 +24,8 @@ Generates IDs like so (highest-to-lowest bit order):
 `[1b:unused][41b: time in ms since epoch][10b: machine ID][12b: counter]`
 
 Machine ID is a number from 0 to 1023 (inclusive) that identifies the snowflake server. It is retrieved from an environment variable or the end of the hostname (ex: `snowflake-0` or `snowflake-2`). Epoch is 2018-01-01T00:00:00Z. Counter is the number of IDs generated this millisecond between 0 and 4095 (inclusive). If the counter rotates down to 0 then the server waits until the next clock millisecond. If the clock runs backwards, the previous millisecond timestamp is used.
+
+Note: Machine ID is automatically populated if you're using a StatefulSet in Kubernetes and the `MACHINE_ID` environment variable is set to `HOST`.
 
 ## License
 MIT License

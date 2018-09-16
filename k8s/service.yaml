@@ -1,0 +1,14 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: snowflake
+  labels:
+    app: snowflake
+    tier: api
+spec:
+  type: NodePort # needed for GCP!
+  ports:
+  - port: 80
+    targetPort: 8080
+  selector:
+    app: snowflake

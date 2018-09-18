@@ -144,21 +144,25 @@ func main() {
 
 	// Health Check
 	router.HandleFunc("/healthz", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(healthCheckResponse{Status: "OK"})
 	}).Methods("GET")
 
 	// Specs
 	router.HandleFunc("/spec.yaml", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/x-yaml")
 		http.ServeFile(w, r, "specs/spec.yaml")
 	}).Methods("GET")
 
 	router.HandleFunc("/spec.json", func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		http.ServeFile(w, r, "specs/spec.json")
 	}).Methods("GET")
 
 	// Single Snowflake ID
 	router.HandleFunc("", func(w http.ResponseWriter, r *http.Request) {
 		id := generateID(machineID, epoch)
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(snowflakeResponse{ID: id, IDString: fmt.Sprintf("%d", id)})
 	}).Methods("GET")
 
@@ -178,6 +182,7 @@ func main() {
 			ids[i] = snowflakeResponse{ID: id, IDString: strconv.FormatUint(id, 10)}
 		}
 
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(ids)
 	}).Methods("GET")
 

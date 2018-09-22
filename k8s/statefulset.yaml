@@ -5,7 +5,9 @@ metadata:
 spec:
   replicas: 1
   selector:
-    app: snowflake
+    matchLabels:
+      app: snowflake
+  serviceName: snowflake
   template:
     metadata:
       labels:
@@ -26,10 +28,10 @@ spec:
         - containerPort: 8080
         env:
         - name: PORT
-          value: 8080
+          value: "8080"
         - name: MACHINE_ID
-          value: $HOST
+          value: HOST
         - name: SNOWFLAKE_EPOCH
-          value: 1514764800
+          value: "1514764800"
         - name: APP_BASE_PATH
           value: /v1/snowflake

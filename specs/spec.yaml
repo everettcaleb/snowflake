@@ -62,14 +62,14 @@ components:
           schema:
             $ref: '#/components/schemas/Error'
 paths:
-  /:
+  /id:
     get:
       operationId: getSnowflake
       description: Gets a single Snowflake ID
       responses:
         '200':
           $ref: '#/components/responses/SnowflakeResponse'
-  /{count}:
+  /ids/{count}:
     get:
       operationId: getSnowflakes
       description: Get more than one Snowflake ID in one shot

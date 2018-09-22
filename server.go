@@ -45,12 +45,12 @@ func main() {
 	})
 
 	// Single Snowflake ID
-	routeGroup.GET("/", func(c *gin.Context) {
+	routeGroup.GET("id", func(c *gin.Context) {
 		c.JSON(200, makeSnowflakeResponse(generator.NextID()))
 	})
 
 	// Multiple Snowflake IDs
-	routeGroup.GET("/:count", func(c *gin.Context) {
+	routeGroup.GET("/ids/:count", func(c *gin.Context) {
 		str := c.Params.ByName("count")
 		count, err := strconv.ParseInt(str, 10, 32)
 		if err != nil {

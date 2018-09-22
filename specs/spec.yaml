@@ -1,7 +1,7 @@
 openapi: 3.0.1
 info:
   title: snowflake
-  version: 1.0.0
+  version: 1.1.0
   description: An API that generates IDs inspired by Twitter's Snowflake formula
   license:
     name: MIT

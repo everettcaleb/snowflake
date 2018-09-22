@@ -1,11 +1,13 @@
-FROM golang:alpine
+FROM golang:alpine AS builder
 RUN apk add --no-cache git
 WORKDIR /go/src/github.com/everettcaleb/snowflake/
 RUN go get -v github.com/bronze1man/yaml2json
-RUN go get -v github.com/gorilla/mux
+RUN go get -v github.com/gin-gonic/gin
 
 COPY specs specs
 COPY server.go server.go
+COPY helpers.go helpers.go
+COPY snowflake.go snowflake.go
 RUN cat specs/spec.yaml | yaml2json > specs/spec.json
 RUN go build -o server .
 
@@ -16,8 +18,8 @@ ENV SNOWFLAKE_EPOCH 1514764800
 ENV APP_BASE_PATH /v1/snowflake
 ENV PORT 8080
 
-COPY --from=0 /go/src/github.com/everettcaleb/snowflake/specs specs
-COPY --from=0 /go/src/github.com/everettcaleb/snowflake/server server
+COPY --from=builder /go/src/github.com/everettcaleb/snowflake/specs specs
+COPY --from=builder /go/src/github.com/everettcaleb/snowflake/server server
 
 EXPOSE 8080
 CMD [ "./server" ]

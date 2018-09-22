@@ -4,6 +4,8 @@ metadata:
   name: snowflake
 spec:
   replicas: 1
+  selector:
+    app: snowflake
   template:
     metadata:
       labels:

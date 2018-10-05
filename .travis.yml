@@ -14,7 +14,7 @@ script:
   - mv specs/spec.yaml specs/spec.yaml.old
   - 'cat specs/spec.yaml.old | sed "s/version: VERSION/version: $TRAVIS_TAG/" > specs/spec.yaml'
   - rm specs/spec.yaml.old
-  - docker build -t everettcaleb/snowflake .
+  - docker build -t everettcaleb/snowflake . --squash
 deploy:
   provider: script
   script: bash scripts/push-docker.sh

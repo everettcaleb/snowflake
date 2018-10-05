@@ -3,6 +3,7 @@ ID generation service inspired by Twitter's [Snowflake](https://github.com/twitt
 
 [![Build Status](https://travis-ci.com/everettcaleb/snowflake.svg?branch=master)](https://travis-ci.com/everettcaleb/snowflake)
 [![Coverage Status](https://coveralls.io/repos/github/everettcaleb/snowflake/badge.svg?branch=master)](https://coveralls.io/github/everettcaleb/snowflake?branch=master)
+[![Codacy Badge](https://api.codacy.com/project/badge/Grade/7c8e46edb5444b29b21cb1b9b2cbe25e)](https://www.codacy.com/app/everettcaleb/snowflake?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=everettcaleb/snowflake&amp;utm_campaign=Badge_Grade)
 [![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 ## Using with Docker

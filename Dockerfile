@@ -8,11 +8,11 @@ COPY specs specs
 COPY server.go server.go
 COPY helpers.go helpers.go
 COPY snowflake.go snowflake.go
-RUN cat specs/spec.yaml | yaml2json > specs/spec.json
+RUN yaml2json > specs/spec.json < specs/spec.yaml
 RUN go get .
 RUN go build -o server .
 
-FROM alpine
+FROM alpine:latest
 
 ENV MACHINE_ID $HOST
 ENV SNOWFLAKE_EPOCH 1514764800

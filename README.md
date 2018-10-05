@@ -1,10 +1,12 @@
 # Snowflake API
 ID generation service inspired by Twitter's [Snowflake](https://github.com/twitter-archive/snowflake/tree/b3f6a3c6ca8e1b6847baa6ff42bf72201e2c2231)
 
+
+
 ## Using with Docker
 You can run the following command to run it locally from [Docker Hub](https://hub.docker.com/r/everettcaleb/snowflake/):
 
-    docker run -d --name snowflake -e MACHINE_ID=0 -p 8080:8080 everettcaleb/snowflake:1
+    docker run -d --name snowflake -e MACHINE_ID=0 -p 8080:8080 everettcaleb/snowflake
 
 Then you can test it with:
 

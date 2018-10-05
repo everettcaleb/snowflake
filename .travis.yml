@@ -1,0 +1,22 @@
+language: go
+go:
+  - "1.x"
+go_import_path: github.com/everettcaleb/snowflake
+services:
+  - docker
+install:
+  - go get -t .
+  - go get golang.org/x/tools/cmd/cover
+  - go get github.com/mattn/goveralls
+script:
+  - go test -v -covermode=count -coverprofile=coverage.out
+  - goveralls -coverprofile=coverage.out -service=travis-ci -repotoken $COVERALLS_TOKEN
+  - mv specs/spec.yaml specs/spec.yaml.old
+  - 'cat specs/spec.yaml.old | sed "s/version: VERSION/version: $TRAVIS_TAG/" > specs/spec.yaml'
+  - rm specs/spec.yaml.old
+  - docker build -t everettcaleb/snowflake .
+deploy:
+  provider: script
+  script: bash scripts/push-docker.sh
+  on:
+    tags: true

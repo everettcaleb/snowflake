@@ -1,14 +1,13 @@
 FROM golang:alpine AS builder
 RUN apk add --no-cache git
 WORKDIR /go/src/github.com/everettcaleb/snowflake/
-RUN go get -v github.com/bronze1man/yaml2json
-RUN go get -v github.com/gin-gonic/gin
 
 COPY specs specs
 COPY server.go server.go
 COPY helpers.go helpers.go
 COPY snowflake.go snowflake.go
 RUN cat specs/spec.yaml | yaml2json > specs/spec.json
+RUN go get .
 RUN go build -o server .
 
 FROM alpine

@@ -16,7 +16,7 @@ spec:
     spec:
       containers:
       - name: snowflake
-        image: everettcaleb/snowflake:1
+        image: everettcaleb/snowflake
         readinessProbe:
           httpGet:
             path: /v1/snowflake/healthz

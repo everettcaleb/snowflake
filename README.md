@@ -1,7 +1,9 @@
 # Snowflake API
 ID generation service inspired by Twitter's [Snowflake](https://github.com/twitter-archive/snowflake/tree/b3f6a3c6ca8e1b6847baa6ff42bf72201e2c2231)
 
-
+[![Build Status](https://travis-ci.com/everettcaleb/snowflake.svg?branch=master)](https://travis-ci.com/everettcaleb/snowflake)
+[![Coverage Status](https://coveralls.io/repos/github/everettcaleb/snowflake/badge.svg?branch=master)](https://coveralls.io/github/everettcaleb/snowflake?branch=master)
+[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](LICENSE)
 
 ## Using with Docker
 You can run the following command to run it locally from [Docker Hub](https://hub.docker.com/r/everettcaleb/snowflake/):

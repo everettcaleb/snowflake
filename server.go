@@ -18,6 +18,8 @@ func main() {
 		panic(err)
 	}
 
+	fmt.Println("Snowflake Machine ID:", machineID)
+
 	generator := newSnowflakeGenerator(config, machineID)
 	router := gin.Default()
 	routeGroup := router.Group(config.BasePath)
@@ -43,7 +45,7 @@ func main() {
 		id := generator.NextID()
 		c.JSON(200, &snowflakeResponse{
 			ID:       id,
-			IDString: string(id),
+			IDString: strconv.FormatUint(uint64(id), 10),
 		})
 	})
 
@@ -62,7 +64,7 @@ func main() {
 			id := generator.NextID()
 			ids[i] = &snowflakeResponse{
 				ID:       id,
-				IDString: string(id),
+				IDString: strconv.FormatUint(uint64(id), 10),
 			}
 		}
 
@@ -70,6 +72,6 @@ func main() {
 	})
 
 	// Listen
-	fmt.Printf("Server listening on %d\n", config.Port)
-	router.Run(":" + string(config.Port))
+	fmt.Printf("Server listening on %v\n", config.Port)
+	router.Run(":" + strconv.Itoa(config.Port))
 }

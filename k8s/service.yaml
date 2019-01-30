@@ -6,7 +6,6 @@ metadata:
     app: snowflake
     tier: api
 spec:
-  type: NodePort # needed for GCP!
   ports:
   - port: 80
     targetPort: 8080

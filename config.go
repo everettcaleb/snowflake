@@ -10,7 +10,7 @@ type snowflakeEnvConfig struct {
 	BasePath             string `env:"APP_BASE_PATH"`
 	Epoch                uint64 `env:"SNOWFLAKE_EPOCH"`
 	Port                 int    `env:"PORT"`
-	RedisURI             string `env:"REDIS_URI"`
+	RedisURI             string `env:"REDIS_URI" required:"true"`
 	RedisMachineIDPrefix string `env:"REDIS_MACHINE_ID_PREFIX"`
 	UseMilliseconds      bool   `env:"SNOWFLAKE_USE_MILLISECONDS"`
 }

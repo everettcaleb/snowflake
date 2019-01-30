@@ -1,7 +1,8 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
+	"strconv"
 	"testing"
 	"time"
 )
@@ -21,8 +22,13 @@ func incrementingNow(s string) func() time.Time {
 	if err != nil {
 		panic(err)
 	}
+
+	i := 0
 	return func() time.Time {
-		t = t.Add(time.Microsecond)
+		i = (i + 1) % 10
+		if i == 0 {
+			t = t.Add(time.Microsecond)
+		}
 		return t
 	}
 }
@@ -67,7 +73,9 @@ func TestNextID(t *testing.T) {
 		panic(err)
 	}
 
+	oldNow := now
 	now = fixedNow("2039-01-01T00:00:00Z")
+	defer func() { now = oldNow }()
 
 	config := defaultConfig(epoch)
 	config.UseMilliseconds = false
@@ -105,8 +113,98 @@ func TestNextID(t *testing.T) {
 
 	// check the format of a few
 
-	// TEMP: printing out the first 100
-	for _, id := range ids {
-		fmt.Println(id)
+	// TEMP: printing out the first 50
+	// for _, id := range ids[:50] {
+	// 	fmt.Println(id)
+	// }
+}
+
+func TestNextID10000MS(t *testing.T) {
+	epoch, err := time.Parse(time.RFC3339, "2016-01-01T00:00:00Z")
+	if err != nil {
+		panic(err)
+	}
+
+	oldNow := now
+	now = incrementingNow("2020-01-01T00:00:00Z")
+	defer func() { now = oldNow }()
+
+	config := defaultConfig(epoch)
+	config.UseMilliseconds = true
+	sg := newSnowflakeGenerator(config, 1023)
+
+	ids := make([]snowflakeID, 10000)
+	for i := 0; i < 10000; i++ {
+		ids[i] = sg.NextID()
+	}
+
+	// TEMP: printing out the first 50
+	// for _, id := range ids[:50] {
+	// 	fmt.Println(id)
+	// }
+}
+
+func TestNextID10000S(t *testing.T) {
+	epoch, err := time.Parse(time.RFC3339, "2016-01-01T00:00:00Z")
+	if err != nil {
+		panic(err)
+	}
+
+	oldNow := now
+	now = incrementingNow("2020-01-01T00:00:00Z")
+	defer func() { now = oldNow }()
+
+	config := defaultConfig(epoch)
+	config.UseMilliseconds = false
+	sg := newSnowflakeGenerator(config, 1023)
+
+	ids := make([]snowflakeID, 10000)
+	for i := 0; i < 10000; i++ {
+		ids[i] = sg.NextID()
+	}
+
+	// TEMP: printing out the first 50
+	// for _, id := range ids[:50] {
+	// 	fmt.Println(id)
+	// }
+}
+
+func BenchmarkNextID(b *testing.B) {
+	epoch, err := time.Parse(time.RFC3339, "2016-01-01T00:00:00Z")
+	if err != nil {
+		panic(err)
+	}
+
+	oldNow := now
+	now = incrementingNow("2020-01-01T00:00:00Z")
+	defer func() { now = oldNow }()
+
+	config := defaultConfig(epoch)
+	sg := newSnowflakeGenerator(config, 1023)
+
+	for n := 0; n < b.N; n++ {
+		sg.NextID()
+	}
+}
+
+func BenchmarkNextIDWithJSON(b *testing.B) {
+	epoch, err := time.Parse(time.RFC3339, "2016-01-01T00:00:00Z")
+	if err != nil {
+		panic(err)
+	}
+
+	oldNow := now
+	now = incrementingNow("2020-01-01T00:00:00Z")
+	defer func() { now = oldNow }()
+
+	config := defaultConfig(epoch)
+	sg := newSnowflakeGenerator(config, 1023)
+
+	for n := 0; n < b.N; n++ {
+		id := sg.NextID()
+		json.Marshal(snowflakeResponse{
+			ID:       id,
+			IDString: strconv.FormatUint(uint64(id), 10),
+		})
 	}
 }

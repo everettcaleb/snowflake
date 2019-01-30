@@ -9,28 +9,29 @@ ID generation service inspired by Twitter's [Snowflake](https://github.com/twitt
 ## Using with Docker
 You can run the following command to run it locally from [Docker Hub](https://hub.docker.com/r/everettcaleb/snowflake/):
 
-    docker run -d --name snowflake -e MACHINE_ID=0 -p 8080:8080 everettcaleb/snowflake
+    docker run -d --name snowflake -e REDIS_URI="redis://host:port/" -p 8080:8080 everettcaleb/snowflake
 
 Then you can test it with:
 
-    curl http://localhost:8080/v1/snowflake
+    curl http://localhost:8080/id
 
 ## Using with Kubernetes
-You can deploy it as a [StatefulSet](k8s/statefulset.yaml) and [Service](k8s/service.yaml) (a Deployment won't work because the `MACHINE_ID` values need to be unique):
+You can deploy it as a [Deployment](k8s/deployment.yaml) and [Service](k8s/service.yaml):
 
-    kubectl create -f k8s/statefulset.yaml
+    kubectl create -f k8s/deployment.yaml
     kubectl create -f k8s/service.yaml
 
-The defaults should be suitable for most users. You can use it from within the cluster via service DNS as `http://snowflake.default`.
+The defaults should be suitable for most users. You will need to give it a `REDIS_URI` environment variable. You can use it from within the cluster via service DNS as `http://snowflake.default`.
 
 ## How It Works
 Generates IDs like so (highest-to-lowest bit order):
 
-`[1b:unused][41b: time in ms since epoch][10b: machine ID][12b: counter]`
+`[1b:unused][41b: time in ticks since epoch][10b: machine ID][12b: counter]`
 
-Machine ID is a number from 0 to 1023 (inclusive) that identifies the snowflake server. It is retrieved from an environment variable or the end of the hostname (ex: `snowflake-0` or `snowflake-2`). Epoch is 2018-01-01T00:00:00Z. Counter is the number of IDs generated this millisecond between 0 and 4095 (inclusive). If the counter rotates down to 0 then the server waits until the next clock millisecond. If the clock runs backwards, the previous millisecond timestamp is used.
+Ticks are either seconds (default) or milliseconds (use the `SNOWFLAKE_USE_MILLISECONDS` environment variable and `"true"` or `"false"` to override). Machine ID is a number from 0 to 1023 (inclusive) that identifies the snowflake server. It is picked at random (using math/rand package) and maintained using `SETNX` as a lock in Redis. Default epoch is `2016-01-01T00:00:00Z`, it can be set using the `SNOWFLAKE_EPOCH` environment variable (unit is seconds since Unix epoch). Counter is the number of IDs generated this tick between 0 and 4095 (inclusive). If the counter rotates down to 0 then the server waits until the next clock tick. If the clock runs backwards for any reason, the previous tick timestamp is used.
 
-Note: Machine ID is automatically populated if you're using a StatefulSet in Kubernetes and the `MACHINE_ID` environment variable is set to `HOST`.
+## TODO
+I need to improve the documentation in the code and perhaps provide example requests and a link to the spec in a OpenAPI editor or something.
 
 ## License
 MIT License

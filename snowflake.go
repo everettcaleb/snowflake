@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"sync"
 	"time"
 )
 
@@ -52,6 +53,7 @@ func newSnowflakeGenerator(config *snowflakeEnvConfig, machineID uint64) *snowfl
 }
 
 type snowflakeGenerator struct {
+	mutex         sync.Mutex
 	counter       uint64
 	epoch         uint64
 	lastTimestamp uint64
@@ -78,6 +80,10 @@ func splitSnowflakeID(id snowflakeID) *snowflakeIDParts {
 func (s *snowflakeGenerator) NextID() snowflakeID {
 	// Time since 1970-01-01 in milliseconds
 	timestamp := s.timestampFunc()
+
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
 	if timestamp < s.lastTimestamp {
 		timestamp = s.lastTimestamp
 	}
@@ -94,6 +100,7 @@ func (s *snowflakeGenerator) NextID() snowflakeID {
 	}
 
 	s.lastTimestamp = timestamp
+
 	td := timestamp - s.epoch
 	if td >= bits41 {
 		panic(fmt.Errorf("Timestamp epoch delta exceeded 41 bits"))

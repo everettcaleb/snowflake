@@ -1,13 +1,12 @@
 apiVersion: apps/v1
-kind: StatefulSet
+kind: Deployment
 metadata:
   name: snowflake
 spec:
-  replicas: 1
+  replicas: 3
   selector:
     matchLabels:
       app: snowflake
-  serviceName: snowflake
   template:
     metadata:
       labels:
@@ -29,8 +28,6 @@ spec:
         env:
         - name: PORT
           value: "8080"
-        - name: MACHINE_ID
-          value: HOST
         - name: SNOWFLAKE_EPOCH
           value: "1514764800"
         - name: APP_BASE_PATH

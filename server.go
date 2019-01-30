@@ -39,15 +39,10 @@ func main() {
 		c.JSON(200, healthCheckResponse{Status: "OK"})
 	})
 
-	// Specs
+	// Spec
 	routeGroup.GET("/spec.yaml", func(c *gin.Context) {
 		c.Header("Content-Type", "application/x-yaml")
 		c.File("specs/spec.yaml")
-	})
-
-	routeGroup.GET("/spec.json", func(c *gin.Context) {
-		c.Header("Content-Type", "application/json")
-		c.File("specs/spec.json")
 	})
 
 	// Single Snowflake ID

@@ -1,15 +1,17 @@
-FROM golang:alpine AS builder
-RUN apk add --no-cache git
+FROM golang AS builder
+ENV GO111MODULE on
 WORKDIR /go/src/github.com/everettcaleb/snowflake/
-RUN go get -v github.com/bronze1man/yaml2json
+
+COPY go.mod go.mod
+COPY go.sum go.sum
+RUN go get
 
 COPY specs specs
+COPY config.go config.go
 COPY server.go server.go
 COPY machine-id.go machine-id.go
 COPY responses.go responses.go
 COPY snowflake.go snowflake.go
-RUN yaml2json > specs/spec.json < specs/spec.yaml
-RUN go get .
 RUN go build -o server .
 
 FROM alpine:latest

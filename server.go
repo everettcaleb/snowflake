@@ -18,7 +18,17 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println("Snowflake Machine ID:", machineID)
+	fmt.Println()
+	fmt.Println("Config:")
+	fmt.Println("==========")
+	fmt.Println("Machine ID:", machineID)
+	fmt.Println("Base Path:", config.BasePath)
+	fmt.Println("Epoch:", config.Epoch)
+	fmt.Println("Port:", config.Port)
+	fmt.Println("Redis Machine ID Prefix:", config.RedisMachineIDPrefix)
+	fmt.Println("Redis URI:", config.RedisURI)
+	fmt.Println("Use Milliseconds:", config.UseMilliseconds)
+	fmt.Println()
 
 	generator := newSnowflakeGenerator(config, machineID)
 	router := gin.Default()

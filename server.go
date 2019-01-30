@@ -8,25 +8,19 @@ import (
 )
 
 func main() {
-	machineID, err := getMachineID()
+	config, err := loadEnvConfig()
 	if err != nil {
 		panic(err)
 	}
 
-	epoch, err := getEpoch()
-	if err != nil {
-		panic(err)
-	}
-	fmt.Printf("Epoch(ms): %d\n", epoch)
-
-	port, err := getListenerPort()
+	machineID, err := initMachineID(config)
 	if err != nil {
 		panic(err)
 	}
 
-	generator := makeSnowflakeGenerator(machineID, epoch)
+	generator := newSnowflakeGenerator(config, machineID)
 	router := gin.Default()
-	routeGroup := router.Group(getBasePath())
+	routeGroup := router.Group(config.BasePath)
 
 	// Health Check
 	routeGroup.GET("/healthz", func(c *gin.Context) {
@@ -46,7 +40,11 @@ func main() {
 
 	// Single Snowflake ID
 	routeGroup.GET("id", func(c *gin.Context) {
-		c.JSON(200, makeSnowflakeResponse(generator.NextID()))
+		id := generator.NextID()
+		c.JSON(200, &snowflakeResponse{
+			ID:       id,
+			IDString: string(id),
+		})
 	})
 
 	// Multiple Snowflake IDs
@@ -61,13 +59,17 @@ func main() {
 		var i int64
 		ids := make([]*snowflakeResponse, count)
 		for i = 0; i < count; i++ {
-			ids[i] = makeSnowflakeResponse(generator.NextID())
+			id := generator.NextID()
+			ids[i] = &snowflakeResponse{
+				ID:       id,
+				IDString: string(id),
+			}
 		}
 
 		c.JSON(200, ids)
 	})
 
 	// Listen
-	fmt.Printf("Server listening on %s\n", port)
-	router.Run(port)
+	fmt.Printf("Server listening on %d\n", config.Port)
+	router.Run(":" + string(config.Port))
 }

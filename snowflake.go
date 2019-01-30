@@ -16,50 +16,68 @@ var now = func() time.Time {
 	return time.Now()
 }
 
+func timestamp() uint64 {
+	return uint64(now().Unix())
+}
+
 func msTimestamp() uint64 {
 	return uint64(now().UnixNano() / 1e6)
 }
 
-type snowflakeGenerator struct {
-	counter       uint64
-	lastTimestamp uint64
-	machineID     uint64
-	epoch         uint64
-}
+type snowflakeID uint64
 
-type snowflakeID struct {
-	id        uint64
-	timestamp uint64
-	machineID uint64
+type snowflakeIDParts struct {
+	id        snowflakeID
 	counter   uint64
+	machineID uint64
+	timestamp uint64
 }
 
-// makeSnowflakeGenerator creates a snowflake ID generator instance that tracks generator state
-func makeSnowflakeGenerator(machineID uint64, epoch uint64) *snowflakeGenerator {
+func newSnowflakeGenerator(config *snowflakeEnvConfig, machineID uint64) *snowflakeGenerator {
+	epoch := config.Epoch
+	tsfunc := timestamp
+
+	if config.UseMilliseconds {
+		epoch = epoch * 1000
+		tsfunc = msTimestamp
+	}
+
 	return &snowflakeGenerator{
-		machineID: machineID,
-		epoch:     epoch,
+		counter:       0,
+		epoch:         epoch,
+		lastTimestamp: 0,
+		machineID:     machineID,
+		timestampFunc: tsfunc,
 	}
 }
 
-func splitSnowflakeID(id uint64) *snowflakeID {
-	sid := &snowflakeID{id: id}
+type snowflakeGenerator struct {
+	counter       uint64
+	epoch         uint64
+	lastTimestamp uint64
+	machineID     uint64
+	timestampFunc func() uint64
+}
 
-	sid.counter = id & bits12
-	id = id &^ bits12 >> 12
+func splitSnowflakeID(id snowflakeID) *snowflakeIDParts {
+	rid := uint64(id)
+	sid := &snowflakeIDParts{id: id}
 
-	sid.machineID = id & bits10
-	id = id &^ bits10 >> 10
+	sid.counter = rid & bits12
+	rid = rid &^ bits12 >> 12
 
-	sid.timestamp = id
+	sid.machineID = rid & bits10
+	rid = rid &^ bits10 >> 10
+
+	sid.timestamp = rid
 
 	return sid
 }
 
 // NextID generates the next ID in the sequence
-func (s *snowflakeGenerator) NextID() uint64 {
+func (s *snowflakeGenerator) NextID() snowflakeID {
 	// Time since 1970-01-01 in milliseconds
-	timestamp := msTimestamp()
+	timestamp := s.timestampFunc()
 	if timestamp < s.lastTimestamp {
 		timestamp = s.lastTimestamp
 	}
@@ -68,7 +86,7 @@ func (s *snowflakeGenerator) NextID() uint64 {
 		s.counter = (s.counter + 1) % bit12
 		if s.counter == 0 {
 			for timestamp <= s.lastTimestamp {
-				timestamp = msTimestamp()
+				timestamp = s.timestampFunc()
 			}
 		}
 	} else {
@@ -80,5 +98,5 @@ func (s *snowflakeGenerator) NextID() uint64 {
 	if td >= bits41 {
 		panic(fmt.Errorf("Timestamp epoch delta exceeded 41 bits"))
 	}
-	return ((td & bits41) << 22) + ((s.machineID & bits10) << 12) + s.counter
+	return snowflakeID(((td & bits41) << 22) + ((s.machineID & bits10) << 12) + s.counter)
 }

@@ -1,6 +1,7 @@
 package main
 
 import (
+	"fmt"
 	"testing"
 	"time"
 )
@@ -68,14 +69,16 @@ func TestNextID(t *testing.T) {
 
 	now = fixedNow("2039-01-01T00:00:00Z")
 
-	sg := makeSnowflakeGenerator(1023, uint64(epoch.UnixNano()/1e6))
+	config := defaultConfig(epoch)
+	config.UseMilliseconds = false
+	sg := newSnowflakeGenerator(config, 1023)
 
-	ids := make([]uint64, 2500)
+	ids := make([]snowflakeID, 2500)
 	for i := 0; i < 2500; i++ {
 		ids[i] = sg.NextID()
 	}
 
-	sids := make([]*snowflakeID, 2500)
+	sids := make([]*snowflakeIDParts, 2500)
 	for i, id := range ids {
 		sids[i] = splitSnowflakeID(id)
 	}
@@ -103,7 +106,7 @@ func TestNextID(t *testing.T) {
 	// check the format of a few
 
 	// TEMP: printing out the first 100
-	// for i, id := range ids {
-	// 	fmt.Println(id)
-	// }
+	for _, id := range ids {
+		fmt.Println(id)
+	}
 }

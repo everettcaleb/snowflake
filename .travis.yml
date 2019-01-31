@@ -14,13 +14,23 @@ script:
   - ./cc-test-reporter before-build
   - go test -v -coverprofile=c.out ./...
   - ./cc-test-reporter after-build
-  - mv specs/spec.yaml specs/spec.yaml.old
-  - 'cat specs/spec.yaml.old | sed "s/version: VERSION/version: $TRAVIS_TAG/" > specs/spec.yaml'
-  - rm specs/spec.yaml.old
   - docker build -t everettcaleb/snowflake .
 deploy:
   provider: script
-  script: bash scripts/push-docker.sh
+  script: |
+    if [[ $TRAVIS_TAG ]]; then
+      TAG_VERSION=$(echo -n $TRAVIS_TAG | sed 's/v//')
+      TAG_W_MINOR=$(echo -n $TAG_VERSION | sed 's/\.[0-9]*$//g')
+      TAG_MAJOR=$(echo -n $TAG_VERSION | sed 's/\.[0-9]*\.[0-9]*$//g')
+      echo -n $DOCKER_PASSWORD | docker login -u $DOCKER_USERNAME --password-stdin
+      docker tag everettcaleb/snowflake everettcaleb/snowflake:$TAG_VERSION
+      docker tag everettcaleb/snowflake everettcaleb/snowflake:$TAG_W_MINOR
+      docker tag everettcaleb/snowflake everettcaleb/snowflake:$TAG_MAJOR
+      docker push everettcaleb/snowflake:$TAG_VERSION
+      docker push everettcaleb/snowflake:$TAG_W_MINOR
+      docker push everettcaleb/snowflake:$TAG_MAJOR
+      docker push everettcaleb/snowflake
+    fi
   skip_cleanup: true
   on:
     tags: true

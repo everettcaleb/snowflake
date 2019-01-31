@@ -7,7 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-func main() {
+func initGenerator() (*snowflakeEnvConfig, *snowflakeGenerator) {
 	config, err := loadEnvConfig()
 	if err != nil {
 		panic(err)
@@ -18,31 +18,13 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Println()
-	fmt.Println("Config:")
-	fmt.Println("==========")
-	fmt.Println("Machine ID:", machineID)
-	fmt.Println("Base Path:", config.BasePath)
-	fmt.Println("Epoch:", config.Epoch)
-	fmt.Println("Port:", config.Port)
-	fmt.Println("Redis Machine ID Prefix:", config.RedisMachineIDPrefix)
-	fmt.Println("Redis URI:", config.RedisURI)
-	fmt.Println("Use Milliseconds:", config.UseMilliseconds)
-	fmt.Println()
+	return config, newSnowflakeGenerator(config, machineID)
+}
 
-	generator := newSnowflakeGenerator(config, machineID)
-	router := gin.Default()
-	routeGroup := router.Group(config.BasePath)
-
+func initRoutes(routeGroup *gin.RouterGroup, generator *snowflakeGenerator) {
 	// Health Check
 	routeGroup.GET("/healthz", func(c *gin.Context) {
 		c.JSON(200, healthCheckResponse{Status: "OK"})
-	})
-
-	// Spec
-	routeGroup.GET("/spec.yaml", func(c *gin.Context) {
-		c.Header("Content-Type", "application/x-yaml")
-		c.File("specs/spec.yaml")
 	})
 
 	// Single Snowflake ID
@@ -75,8 +57,28 @@ func main() {
 
 		c.JSON(200, ids)
 	})
+}
 
-	// Listen
+func main() {
+	// Set up the generator and router
+	router := gin.Default()
+	config, generator := initGenerator()
+	initRoutes(router.Group(config.BasePath), generator)
+
+	// Print out the configuration for debugging purposes
+	fmt.Println()
+	fmt.Println("Config:")
+	fmt.Println("==========")
+	fmt.Println("Machine ID:", generator.machineID)
+	fmt.Println("Base Path:", config.BasePath)
+	fmt.Println("Epoch:", config.Epoch)
+	fmt.Println("Port:", config.Port)
+	fmt.Println("Redis Machine ID Prefix:", config.RedisMachineIDPrefix)
+	fmt.Println("Redis URI:", config.RedisURI)
+	fmt.Println("Use Milliseconds:", config.UseMilliseconds)
+	fmt.Println()
+
+	// Listen for requests
 	fmt.Printf("Server listening on %v\n", config.Port)
 	router.Run(":" + strconv.Itoa(config.Port))
 }

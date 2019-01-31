@@ -6,7 +6,6 @@ COPY go.mod go.mod
 COPY go.sum go.sum
 RUN go get
 
-COPY specs specs
 COPY config.go config.go
 COPY server.go server.go
 COPY machine-id.go machine-id.go

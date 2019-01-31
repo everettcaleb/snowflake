@@ -11,14 +11,13 @@ COPY server.go server.go
 COPY machine-id.go machine-id.go
 COPY responses.go responses.go
 COPY snowflake.go snowflake.go
-RUN go build -o server .
+RUN go build -o snowflake .
 
 FROM alpine:latest
 
 ENV PORT 8080
 
-COPY --from=builder /go/src/github.com/everettcaleb/snowflake/specs specs
-COPY --from=builder /go/src/github.com/everettcaleb/snowflake/server server
+COPY --from=builder /go/src/github.com/everettcaleb/snowflake/snowflake snowflake
 
 EXPOSE 8080
-CMD [ "./server" ]
+CMD [ "./snowflake" ]

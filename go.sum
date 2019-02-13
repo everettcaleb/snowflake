@@ -2,6 +2,8 @@ github.com/davecgh/go-spew v1.1.1 h1:vj9j/u1bqnvCEfJOwUhtlOARqs3+rkHYY13jYWTU97c
 github.com/davecgh/go-spew v1.1.1/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
 github.com/everettcaleb/envconfig v1.0.0 h1:74dd24EoZBTO2E6wUWRtKVB7Fd7+x8uD4BCMpIN6cO8=
 github.com/everettcaleb/envconfig v1.0.0/go.mod h1:xiSCht8DjyWpmB0WpFChmH0IvERhr1OooANwTdxPPJg=
+github.com/everettcaleb/envconfig v1.1.1 h1:EThv1I5Fr6zyaLSNm23FftOt77LSwnQr8OdsUiz96rQ=
+github.com/everettcaleb/envconfig v1.1.1/go.mod h1:xiSCht8DjyWpmB0WpFChmH0IvERhr1OooANwTdxPPJg=
 github.com/gin-contrib/sse v0.0.0-20190125020943-a7658810eb74 h1:FaI7wNyesdMBSkIRVUuEEYEvmzufs7EqQvRAxfEXGbQ=
 github.com/gin-contrib/sse v0.0.0-20190125020943-a7658810eb74/go.mod h1:VJ0WA2NBN22VlZ2dKZQPAPnyWw5XTlK1KymzLKsr59s=
 github.com/gin-gonic/gin v1.3.0 h1:kCmZyPklC0gVdL728E6Aj20uYBJV93nj/TkwBTKhFbs=

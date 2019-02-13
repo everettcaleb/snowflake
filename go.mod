@@ -1,7 +1,7 @@
 module github.com/everettcaleb/snowflake
 
 require (
-	github.com/everettcaleb/envconfig v1.0.0
+	github.com/everettcaleb/envconfig v1.1.1
 	github.com/gin-contrib/sse v0.0.0-20190125020943-a7658810eb74 // indirect
 	github.com/gin-gonic/gin v1.3.0
 	github.com/golang/protobuf v1.2.0 // indirect
